@@ -28,9 +28,10 @@ declare global {
   }
 }
 
-export const useSpeechRecognition = (onTranscript: (transcript: string) => void) => {
+export const useSpeechRecognition = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const [lastTranscript, setLastTranscript] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const isActiveRef = useRef(false);
 
@@ -48,12 +49,11 @@ export const useSpeechRecognition = (onTranscript: (transcript: string) => void)
         const lastResult = event.results[event.results.length - 1];
         if (lastResult.isFinal) {
           const transcript = lastResult[0].transcript;
-          onTranscript(transcript);
+          setLastTranscript(transcript);
         }
       };
 
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        // Silently handle errors - don't show anything
         if (event.error === 'not-allowed') {
           setIsListening(false);
           isActiveRef.current = false;
@@ -61,7 +61,6 @@ export const useSpeechRecognition = (onTranscript: (transcript: string) => void)
       };
 
       recognition.onend = () => {
-        // Automatically restart if we're supposed to be listening
         if (isActiveRef.current) {
           try {
             recognition.start();
@@ -80,7 +79,7 @@ export const useSpeechRecognition = (onTranscript: (transcript: string) => void)
         recognitionRef.current.abort();
       }
     };
-  }, [onTranscript]);
+  }, []);
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isActiveRef.current) {
@@ -102,10 +101,16 @@ export const useSpeechRecognition = (onTranscript: (transcript: string) => void)
     }
   }, []);
 
+  const clearTranscript = useCallback(() => {
+    setLastTranscript(null);
+  }, []);
+
   return {
     isListening,
     isSupported,
+    lastTranscript,
     startListening,
     stopListening,
+    clearTranscript,
   };
 };
