@@ -13,22 +13,27 @@ const Index = () => {
   // Keep screen awake
   useWakeLock();
 
-  const handleTranscript = useCallback((transcript: string) => {
-    const parsed = parseKeywords(transcript);
-    
-    if (parsed.success) {
-      vibrateMatch();
-      setResult(parsed);
-    } else if (parsed.partialMatch) {
-      vibrateError();
-      setResult(parsed);
-    }
-    // If no match at all, don't update display - keep listening silently
-  }, [vibrateMatch, vibrateError]);
+  const { isListening, isSupported, lastTranscript, startListening, clearTranscript } = useSpeechRecognition();
 
-  const { isListening, isSupported, startListening } = useSpeechRecognition(handleTranscript);
+  // Process transcript when it changes
+  useEffect(() => {
+    if (lastTranscript) {
+      const parsed = parseKeywords(lastTranscript);
+      
+      if (parsed.success) {
+        vibrateMatch();
+        setResult(parsed);
+      } else if (parsed.partialMatch) {
+        vibrateError();
+        setResult(parsed);
+      }
+      clearTranscript();
+    }
+  }, [lastTranscript, vibrateMatch, vibrateError, clearTranscript]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
+    
     // If already activated, a tap clears the result
     if (isActivated && result) {
       setResult(null);
@@ -45,7 +50,8 @@ const Index = () => {
     }
   }, [isActivated, result, vibrateReady, startListening]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent | React.MouseEvent) => {
+    e.preventDefault();
     if (longPressTimerRef.current) {
       clearTimeout(longPressTimerRef.current);
       longPressTimerRef.current = null;
@@ -53,7 +59,8 @@ const Index = () => {
   }, []);
 
   // Clear result on tap
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
     if (isActivated && result) {
       setResult(null);
     }
@@ -92,6 +99,13 @@ const Index = () => {
         cursor: 'default'
       }}
     >
+      {/* Listening indicator - small text at bottom */}
+      {isListening && (
+        <p className="absolute bottom-8 text-[#333333] text-xs font-light tracking-widest uppercase">
+          listening
+        </p>
+      )}
+
       {result && (
         <div className="text-center px-8">
           {result.success ? (
