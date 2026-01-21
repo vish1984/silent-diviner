@@ -78,7 +78,7 @@ const Index = () => {
   if (!isSupported) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <p className="text-[#444444] text-sm font-light tracking-wide">
+        <p className="text-[#444444] text-2xl font-light tracking-wide">
           Speech recognition not supported
         </p>
       </div>
@@ -101,7 +101,7 @@ const Index = () => {
     >
       {/* Listening indicator - small text at bottom */}
       {isListening && (
-        <p className="absolute bottom-8 text-[#333333] text-xs font-light tracking-widest uppercase">
+        <p className="absolute bottom-8 text-[#333333] text-xl font-light tracking-widest uppercase">
           listening
         </p>
       )}
@@ -109,32 +109,32 @@ const Index = () => {
       {result && (
         <div className="text-center px-8">
           {result.success && result.resultA && result.resultB ? (
-            <div className="space-y-6">
-              <div className="space-y-1">
-                <p className="text-[#444444] text-xl font-light tracking-[0.2em]">
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <p className="text-[#444444] text-4xl font-light tracking-[0.2em]">
                   {result.resultA.label}: {result.resultA.date} - {result.resultA.zodiac}
                 </p>
-                <p className="text-[#333333] text-xs font-light tracking-wider">
+                <p className="text-[#333333] text-xl font-light tracking-wider">
                   ({result.resultA.keywords})
                 </p>
               </div>
-              <div className="space-y-1">
-                <p className="text-[#444444] text-xl font-light tracking-[0.2em]">
+              <div className="space-y-2">
+                <p className="text-[#444444] text-4xl font-light tracking-[0.2em]">
                   {result.resultB.label}: {result.resultB.date} - {result.resultB.zodiac}
                 </p>
-                <p className="text-[#333333] text-xs font-light tracking-wider">
+                <p className="text-[#333333] text-xl font-light tracking-wider">
                   ({result.resultB.keywords})
                 </p>
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {result.partialMatch && (
-                <p className="text-[#333333] text-xs font-light tracking-wider uppercase">
+                <p className="text-[#333333] text-xl font-light tracking-wider uppercase">
                   Heard: {Object.values(result.partialMatch).filter(Boolean).join(', ')}
                 </p>
               )}
-              <p className="text-[#444444] text-xs font-light tracking-wider">
+              <p className="text-[#444444] text-xl font-light tracking-wider">
                 {result.error}
               </p>
             </div>
