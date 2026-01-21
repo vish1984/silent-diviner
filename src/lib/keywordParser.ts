@@ -90,53 +90,37 @@ function findKeywords(transcript: string): FoundKeyword[] {
 }
 
 function getZodiacSign(month: number, day: number): string {
-  // Handle day overflow to next month
+  // Handle month overflow for zodiac calculation
   const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  let adjustedMonth = month;
+  let adjustedDay = day;
   
-  while (day > daysInMonth[month - 1]) {
-    day -= daysInMonth[month - 1];
-    month = month >= 12 ? 1 : month + 1;
-  }
-  
-  while (day < 1) {
-    month = month <= 1 ? 12 : month - 1;
-    day += daysInMonth[month - 1];
+  // Normalize for zodiac lookup
+  while (adjustedDay > daysInMonth[adjustedMonth - 1]) {
+    adjustedDay -= daysInMonth[adjustedMonth - 1];
+    adjustedMonth = adjustedMonth >= 12 ? 1 : adjustedMonth + 1;
   }
 
-  // Find the zodiac sign
+  // Find the zodiac sign based on transition limits
   for (let i = ZODIAC_TRANSITIONS.length - 1; i >= 0; i--) {
     const transition = ZODIAC_TRANSITIONS[i];
-    if (month === transition.month && day >= transition.day) {
+    if (adjustedMonth === transition.month && adjustedDay >= transition.day) {
       return transition.sign;
     }
-    if (month > transition.month || (month === 1 && transition.month === 12)) {
-      if (month === 1 && transition.month === 12) {
-        // January before Jan 20 is Capricorn
-        if (day < 20) return 'CAPRICORN';
+    if (adjustedMonth > transition.month || (adjustedMonth === 1 && transition.month === 12)) {
+      if (adjustedMonth === 1 && transition.month === 12) {
+        if (adjustedDay < 20) return 'CAPRICORN';
         return 'AQUARIUS';
       }
       return transition.sign;
     }
   }
 
-  // Default case for early January
   return 'CAPRICORN';
 }
 
 function formatResult(month: number, day: number): string {
-  const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  
-  // Handle day overflow
-  while (day > daysInMonth[month - 1]) {
-    day -= daysInMonth[month - 1];
-    month = month >= 12 ? 1 : month + 1;
-  }
-  
-  while (day < 1) {
-    month = month <= 1 ? 12 : month - 1;
-    day += daysInMonth[month - 1];
-  }
-
+  // Display raw month and day without overflow handling
   const monthName = MONTH_NAMES[month - 1];
   const zodiac = getZodiacSign(month, day);
   
@@ -181,15 +165,18 @@ export function parseKeywords(transcript: string): ParseResult {
   // Calculate base day
   let baseDay = economicCategory.value;
   
-  // Check if Red word came AFTER Economic word
-  if (redCategory.position > economicCategory.position) {
+  // Sort keywords by position to determine order
+  const sortedKeywords = [trimester, redCategory, economicCategory].sort((a, b) => a.position - b.position);
+  
+  // Check if Red category is the THIRD keyword (index 2)
+  if (sortedKeywords[2].category === 'red') {
     baseDay += 2;
   }
 
-  // Result A: Month + Base Day
+  // Result A (Right Page): Day as is
   const resultA = formatResult(month, baseDay);
   
-  // Result B: Month + (Base Day - 1)
+  // Result B (Left Page): Day - 1
   const resultB = formatResult(month, baseDay - 1);
 
   return {
