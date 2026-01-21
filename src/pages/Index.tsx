@@ -108,14 +108,24 @@ const Index = () => {
 
       {result && (
         <div className="text-center px-8">
-          {result.success ? (
-            <div className="space-y-4">
-              <p className="text-[#444444] text-2xl font-light tracking-[0.3em]">
-                {result.resultA}
-              </p>
-              <p className="text-[#444444] text-2xl font-light tracking-[0.3em]">
-                {result.resultB}
-              </p>
+          {result.success && result.resultA && result.resultB ? (
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <p className="text-[#444444] text-xl font-light tracking-[0.2em]">
+                  {result.resultA.label}: {result.resultA.date} - {result.resultA.zodiac}
+                </p>
+                <p className="text-[#333333] text-xs font-light tracking-wider">
+                  ({result.resultA.keywords})
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-[#444444] text-xl font-light tracking-[0.2em]">
+                  {result.resultB.label}: {result.resultB.date} - {result.resultB.zodiac}
+                </p>
+                <p className="text-[#333333] text-xs font-light tracking-wider">
+                  ({result.resultB.keywords})
+                </p>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">

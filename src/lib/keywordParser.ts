@@ -41,10 +41,32 @@ const ZODIAC_TRANSITIONS = [
 
 const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
+const ZODIAC_KEYWORDS: Record<string, string> = {
+  'ARIES': 'Restless, Guarded, Impulsive, Perfectionist',
+  'TAURUS': 'Stubborn, Grounded, Loyal, Creative',
+  'GEMINI': 'Dual, Intellectual, Adaptive, Searching',
+  'CANCER': 'Intuitive, Nostalgic, Empathetic, Protective',
+  'LEO': 'Proud, Protective, Playful, Intense',
+  'VIRGO': 'Analytical, Organized, Sensitive, Critical',
+  'LIBRA': 'Balanced, Indecisive, Diplomatic, Refined',
+  'SCORPIO': 'Magnetic, Transformative, Private, Observant',
+  'SAGITTARIUS': 'Philosophical, Honest, Resilient, Independent',
+  'CAPRICORN': 'Strategic, Self-reliant, Ambitious, Humorous',
+  'AQUARIUS': 'Visionary, Independent, Altruistic, Rebellious',
+  'PISCES': 'Dreamer, Fluid, Chameleonic, Soulful',
+};
+
+export interface ResultLine {
+  label: string;
+  date: string;
+  zodiac: string;
+  keywords: string;
+}
+
 export interface ParseResult {
   success: boolean;
-  resultA?: string;
-  resultB?: string;
+  resultA?: ResultLine;
+  resultB?: ResultLine;
   error?: string;
   partialMatch?: {
     trimester?: string;
@@ -119,12 +141,18 @@ function getZodiacSign(month: number, day: number): string {
   return 'CAPRICORN';
 }
 
-function formatResult(month: number, day: number): string {
+function formatResult(month: number, day: number, label: string): ResultLine {
   // Display raw month and day without overflow handling
   const monthName = MONTH_NAMES[month - 1];
   const zodiac = getZodiacSign(month, day);
+  const keywords = ZODIAC_KEYWORDS[zodiac] || '';
   
-  return `${monthName} ${day} - ${zodiac}`;
+  return {
+    label,
+    date: `${monthName} ${day}`,
+    zodiac,
+    keywords,
+  };
 }
 
 export function parseKeywords(transcript: string): ParseResult {
@@ -174,10 +202,10 @@ export function parseKeywords(transcript: string): ParseResult {
   }
 
   // Result A (Right Page): Day as is
-  const resultA = formatResult(month, baseDay);
+  const resultA = formatResult(month, baseDay, 'R');
   
   // Result B (Left Page): Day - 1
-  const resultB = formatResult(month, baseDay - 1);
+  const resultB = formatResult(month, baseDay - 1, 'L');
 
   return {
     success: true,
