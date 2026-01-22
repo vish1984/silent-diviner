@@ -10,6 +10,7 @@ const RED_CATEGORY: Record<string, number> = {
   'romance': 2,
   'partnership': 3,
   'relationships': 4,
+  'relationship': 4,
 };
 
 const ECONOMIC_CATEGORY: Record<string, number> = {
