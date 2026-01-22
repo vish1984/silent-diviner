@@ -1,4 +1,48 @@
-// Keyword dictionaries
+// Fuzzy keyword mappings - phonetic aliases mapped to canonical keywords
+const TRIMESTER_ALIASES: Record<string, string> = {
+  // HEALTH aliases
+  'health': 'health', 'help': 'health', 'healthy': 'health', 'wealth': 'health', 
+  'held': 'health', 'hell': 'health', 'felt': 'health',
+  // CHARACTER aliases
+  'character': 'character', 'charter': 'character', 'actor': 'character', 
+  'chart': 'character', 'director': 'character', 'tractor': 'character', 'kara': 'character',
+  // PERSONALITY aliases
+  'personality': 'personality', 'personal': 'personality', 'reality': 'personality', 
+  'person': 'personality', 'ality': 'personality', 'personally': 'personality',
+};
+
+const RED_ALIASES: Record<string, string> = {
+  // LOVE aliases
+  'love': 'love', 'low': 'love', 'live': 'love', 'laugh': 'love', 'glove': 'love', 'lov': 'love',
+  // ROMANCE aliases
+  'romance': 'romance', 'romans': 'romance', 'roam': 'romance', 'row': 'romance', 'roman': 'romance',
+  // PARTNERSHIP aliases
+  'partnership': 'partnership', 'partner': 'partnership', 'ship': 'partnership', 'part': 'partnership',
+  // RELATIONSHIPS aliases
+  'relationships': 'relationships', 'relationship': 'relationships', 'relation': 'relationships', 
+  'relations': 'relationships', 'ships': 'relationships', 'relate': 'relationships',
+};
+
+const ECONOMIC_ALIASES: Record<string, string> = {
+  // JOB aliases
+  'job': 'job', 'chop': 'job', 'jog': 'job', 'top': 'job', 'bob': 'job', 'jobs': 'job',
+  // WORK aliases
+  'work': 'work', 'walk': 'work', 'word': 'work', 'worth': 'work', 'coke': 'work', 'works': 'work',
+  // MONEY aliases
+  'money': 'money', 'honey': 'money', 'monday': 'money', 'funny': 'money', 'moneys': 'money',
+  // CAREER aliases
+  'career': 'career', 'carrier': 'career', 'korea': 'career', 'clear': 'career', 'care': 'career',
+  // FINANCE aliases
+  'finance': 'finance', 'fine': 'finance', 'ants': 'finance', 'dance': 'finance', 'finances': 'finance',
+  // SUCCESS aliases
+  'success': 'success', 'suck': 'success', 'cess': 'success', 'access': 'success', 'excess': 'success',
+  // PROFESSION aliases
+  'profession': 'profession', 'professor': 'profession', 'session': 'profession', 'fresh': 'profession',
+  // OCCUPATION aliases
+  'occupation': 'occupation', 'occupy': 'occupation', 'passion': 'occupation', 'patient': 'occupation', 'asian': 'occupation',
+};
+
+// Canonical keyword values
 const TRIMESTER: Record<string, number> = {
   'health': 0,
   'character': 4,
@@ -10,7 +54,6 @@ const RED_CATEGORY: Record<string, number> = {
   'romance': 2,
   'partnership': 3,
   'relationships': 4,
-  'relationship': 4,
 };
 
 const ECONOMIC_CATEGORY: Record<string, number> = {
@@ -24,21 +67,36 @@ const ECONOMIC_CATEGORY: Record<string, number> = {
   'occupation': 30,
 };
 
-// Zodiac transitions (day of month when sign changes)
+// Zodiac transitions with Vedic names
 const ZODIAC_TRANSITIONS = [
-  { month: 1, day: 20, sign: 'AQUARIUS' },
-  { month: 2, day: 18, sign: 'PISCES' },
-  { month: 3, day: 20, sign: 'ARIES' },
-  { month: 4, day: 20, sign: 'TAURUS' },
-  { month: 5, day: 20, sign: 'GEMINI' },
-  { month: 6, day: 20, sign: 'CANCER' },
-  { month: 7, day: 22, sign: 'LEO' },
-  { month: 8, day: 22, sign: 'VIRGO' },
-  { month: 9, day: 22, sign: 'LIBRA' },
-  { month: 10, day: 22, sign: 'SCORPIO' },
-  { month: 11, day: 22, sign: 'SAGITTARIUS' },
-  { month: 12, day: 20, sign: 'CAPRICORN' },
+  { month: 1, day: 20, sign: 'AQUARIUS', vedic: 'Kumbh' },
+  { month: 2, day: 18, sign: 'PISCES', vedic: 'Meen' },
+  { month: 3, day: 20, sign: 'ARIES', vedic: 'Mesh' },
+  { month: 4, day: 20, sign: 'TAURUS', vedic: 'Vrishabh' },
+  { month: 5, day: 20, sign: 'GEMINI', vedic: 'Mithun' },
+  { month: 6, day: 20, sign: 'CANCER', vedic: 'Kark' },
+  { month: 7, day: 22, sign: 'LEO', vedic: 'Simha' },
+  { month: 8, day: 22, sign: 'VIRGO', vedic: 'Kanya' },
+  { month: 9, day: 22, sign: 'LIBRA', vedic: 'Tula' },
+  { month: 10, day: 22, sign: 'SCORPIO', vedic: 'Vrishchik' },
+  { month: 11, day: 22, sign: 'SAGITTARIUS', vedic: 'Dhanu' },
+  { month: 12, day: 20, sign: 'CAPRICORN', vedic: 'Makar' },
 ];
+
+const VEDIC_NAMES: Record<string, string> = {
+  'ARIES': 'Mesh',
+  'TAURUS': 'Vrishabh',
+  'GEMINI': 'Mithun',
+  'CANCER': 'Kark',
+  'LEO': 'Simha',
+  'VIRGO': 'Kanya',
+  'LIBRA': 'Tula',
+  'SCORPIO': 'Vrishchik',
+  'SAGITTARIUS': 'Dhanu',
+  'CAPRICORN': 'Makar',
+  'AQUARIUS': 'Kumbh',
+  'PISCES': 'Meen',
+};
 
 const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
@@ -128,6 +186,7 @@ export interface ResultLine {
   label: string;
   date: string;
   zodiac: string;
+  vedic: string;
   reading: ZodiacReading;
 }
 
@@ -150,29 +209,48 @@ interface FoundKeyword {
   position: number;
 }
 
+// Filler words to ignore
+const FILLER_WORDS = new Set([
+  'focus', 'on', 'the', 'and', 'your', 'a', 'an', 'is', 'are', 'was', 'were',
+  'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+  'would', 'could', 'should', 'may', 'might', 'must', 'shall', 'can', 'need',
+  'to', 'of', 'in', 'for', 'with', 'about', 'at', 'by', 'from', 'up', 'out',
+  'into', 'over', 'after', 'that', 'this', 'these', 'those', 'it', 'its',
+  'i', 'me', 'my', 'we', 'us', 'our', 'you', 'he', 'she', 'they', 'them',
+]);
+
 function findKeywords(transcript: string): FoundKeyword[] {
-  const words = transcript.toLowerCase();
+  const text = transcript.toLowerCase();
+  const words = text.split(/\s+/).filter(w => !FILLER_WORDS.has(w));
   const found: FoundKeyword[] = [];
+  const usedCategories = new Set<string>();
 
-  // Find all keyword matches with their positions
-  for (const [keyword, value] of Object.entries(TRIMESTER)) {
-    const pos = words.indexOf(keyword);
-    if (pos !== -1) {
-      found.push({ word: keyword, category: 'trimester', value, position: pos });
+  // Check each word against fuzzy aliases
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i];
+    
+    // Check Trimester aliases
+    if (!usedCategories.has('trimester') && TRIMESTER_ALIASES[word]) {
+      const canonical = TRIMESTER_ALIASES[word];
+      const value = TRIMESTER[canonical];
+      found.push({ word: canonical, category: 'trimester', value, position: text.indexOf(word) });
+      usedCategories.add('trimester');
     }
-  }
-
-  for (const [keyword, value] of Object.entries(RED_CATEGORY)) {
-    const pos = words.indexOf(keyword);
-    if (pos !== -1) {
-      found.push({ word: keyword, category: 'red', value, position: pos });
+    
+    // Check Red Category aliases
+    if (!usedCategories.has('red') && RED_ALIASES[word]) {
+      const canonical = RED_ALIASES[word];
+      const value = RED_CATEGORY[canonical];
+      found.push({ word: canonical, category: 'red', value, position: text.indexOf(word) });
+      usedCategories.add('red');
     }
-  }
-
-  for (const [keyword, value] of Object.entries(ECONOMIC_CATEGORY)) {
-    const pos = words.indexOf(keyword);
-    if (pos !== -1) {
-      found.push({ word: keyword, category: 'economic', value, position: pos });
+    
+    // Check Economic Category aliases
+    if (!usedCategories.has('economic') && ECONOMIC_ALIASES[word]) {
+      const canonical = ECONOMIC_ALIASES[word];
+      const value = ECONOMIC_CATEGORY[canonical];
+      found.push({ word: canonical, category: 'economic', value, position: text.indexOf(word) });
+      usedCategories.add('economic');
     }
   }
 
@@ -213,12 +291,14 @@ function formatResult(month: number, day: number, label: string): ResultLine {
   // Display raw month and day without overflow handling
   const monthName = MONTH_NAMES[month - 1];
   const zodiac = getZodiacSign(month, day);
+  const vedic = VEDIC_NAMES[zodiac] || '';
   const reading = ZODIAC_READINGS[zodiac] || { per: '', pst: '', pre: '', ftr: '' };
   
   return {
     label,
     date: `${monthName} ${day}`,
     zodiac,
+    vedic,
     reading,
   };
 }
