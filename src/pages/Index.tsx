@@ -25,11 +25,14 @@ const Index = () => {
         setResult(parsed);
       } else if (parsed.partialMatch) {
         vibrateError();
-        setResult(parsed);
+        // Only show error if we don't have a successful result displayed
+        if (!result?.success) {
+          setResult(parsed);
+        }
       }
       clearTranscript();
     }
-  }, [lastTranscript, vibrateMatch, vibrateError, clearTranscript]);
+  }, [lastTranscript, vibrateMatch, vibrateError, clearTranscript, result?.success]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
