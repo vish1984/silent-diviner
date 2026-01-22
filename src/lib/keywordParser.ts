@@ -42,26 +42,93 @@ const ZODIAC_TRANSITIONS = [
 
 const MONTH_NAMES = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
-const ZODIAC_KEYWORDS: Record<string, string> = {
-  'ARIES': 'Restless, Guarded, Impulsive, Perfectionist',
-  'TAURUS': 'Stubborn, Grounded, Loyal, Creative',
-  'GEMINI': 'Dual, Intellectual, Adaptive, Searching',
-  'CANCER': 'Intuitive, Nostalgic, Empathetic, Protective',
-  'LEO': 'Proud, Protective, Playful, Intense',
-  'VIRGO': 'Analytical, Organized, Sensitive, Critical',
-  'LIBRA': 'Balanced, Indecisive, Diplomatic, Refined',
-  'SCORPIO': 'Magnetic, Transformative, Private, Observant',
-  'SAGITTARIUS': 'Philosophical, Honest, Resilient, Independent',
-  'CAPRICORN': 'Strategic, Self-reliant, Ambitious, Humorous',
-  'AQUARIUS': 'Visionary, Independent, Altruistic, Rebellious',
-  'PISCES': 'Dreamer, Fluid, Chameleonic, Soulful',
+export interface ZodiacReading {
+  per: string;
+  pst: string;
+  pre: string;
+  ftr: string;
+}
+
+const ZODIAC_READINGS: Record<string, ZodiacReading> = {
+  'ARIES': {
+    per: 'Leader; impatient. Insecure about being "second best."',
+    pst: 'Sudden move or physical scar changed life.',
+    pre: 'Mars burnout. Shifting goals.',
+    ftr: 'Rahu 11th. "Dark horse" deal brings wealth.',
+  },
+  'TAURUS': {
+    per: 'Luxury lover; hoards emotions. Loyal until betrayed.',
+    pst: 'Financial dip or lost heirloom haunts you.',
+    pre: 'Venus Stagnant. Stuck in comfortable routine.',
+    ftr: 'Jupiter Aspect. Property/Bhumi dispute won.',
+  },
+  'GEMINI': {
+    per: 'Dual mind; restless. Talks to hide feelings.',
+    pst: 'Broken friendship in teens broke trust.',
+    pre: 'Mercury Retro. Family rift over misunderstood words.',
+    ftr: 'Ketu Influence. Dropping major habit; reinvention.',
+  },
+  'CANCER': {
+    per: 'Emotional sponge. Silent but remembers everything.',
+    pst: 'Strong maternal struggle influenced your 20s.',
+    pre: 'Moon anxiety. Obsessing over home/money.',
+    ftr: "Shani's Grace. Long-term \"dosha\" or health issue clears.",
+  },
+  'LEO': {
+    per: 'Gold heart; Ego armor. Needs validation.',
+    pst: 'Public shame turned into greatest strength.',
+    pre: 'Sun Peak pressure. Weight of the world on you.',
+    ftr: 'Rahu Shadow. Beware "fake" mentor/shortcut.',
+  },
+  'VIRGO': {
+    per: 'Over-thinker; notices dust first. Secret romantic.',
+    pst: 'Education struggle due to distraction/focus.',
+    pre: 'Mercury Sharp. Fixated on tiny work/health detail.',
+    ftr: 'Mercury Direct. Side-hustle/hobby breakthrough.',
+  },
+  'LIBRA': {
+    per: 'Peace-maker; hates Tamasha. Indecisive.',
+    pst: 'Major sacrifice for partner went unrewarded.',
+    pre: 'Venus Clouded. Heart vs Head in relationship.',
+    ftr: "Shani's Justice. Legal/Karmic debt paid back to you.",
+  },
+  'SCORPIO': {
+    per: 'Intense; sees lies. Hates forever.',
+    pst: '"Near-death" or deep betrayal killed old self.',
+    pre: 'Mars/Ketu Heat. Intense internal anger/target.',
+    ftr: 'Hidden Treasure. Unexpected inheritance/secret money.',
+  },
+  'SAGITTARIUS': {
+    per: 'Truth-seeker; blunt. Hates rules.',
+    pst: 'Failed Yatra/journey taught life lesson.',
+    pre: 'Jupiter Retro. Questioning faith/career path.',
+    ftr: 'Foreign Gain. Success via Videsh connection.',
+  },
+  'CAPRICORN': {
+    per: 'Old soul; serious exterior, lonely interior.',
+    pst: 'Grew up too fast. Adult problems as a child.',
+    pre: "Shani's Test. Slow progress; heavy weight.",
+    ftr: 'Sade Sati Ending. Hard years over. Authority coming.',
+  },
+  'AQUARIUS': {
+    per: 'Rebel. Thinks for world, forgets self.',
+    pst: 'The "alien" in family/social circle.',
+    pre: 'Rahu/Saturn Mix. Tech project/major insomnia.',
+    ftr: 'Ketu Insight. Spiritual awakening changes direction.',
+  },
+  'PISCES': {
+    per: 'Dreamer; escapes reality. Feels "used."',
+    pst: 'Secret sorrow. Lost love or "what if" scenario.',
+    pre: "Jupiter Drowning. Overwhelmed by others' emotions.",
+    ftr: 'Venus Rising. Creative project brings fame/peace.',
+  },
 };
 
 export interface ResultLine {
   label: string;
   date: string;
   zodiac: string;
-  keywords: string;
+  reading: ZodiacReading;
 }
 
 export interface ParseResult {
@@ -146,13 +213,13 @@ function formatResult(month: number, day: number, label: string): ResultLine {
   // Display raw month and day without overflow handling
   const monthName = MONTH_NAMES[month - 1];
   const zodiac = getZodiacSign(month, day);
-  const keywords = ZODIAC_KEYWORDS[zodiac] || '';
+  const reading = ZODIAC_READINGS[zodiac] || { per: '', pst: '', pre: '', ftr: '' };
   
   return {
     label,
     date: `${monthName} ${day}`,
     zodiac,
-    keywords,
+    reading,
   };
 }
 
