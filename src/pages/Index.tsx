@@ -110,24 +110,30 @@ const Index = () => {
       )}
 
       {result && (
-        <div className="text-center px-8">
+        <div className="text-left px-8">
           {result.success && result.resultA && result.resultB ? (
-            <div className="space-y-8">
+            <div className="space-y-10">
               <div className="space-y-2">
-                <p className="text-[#444444] text-4xl font-light tracking-[0.2em]">
+                <p className="text-white text-4xl font-light tracking-[0.2em]">
                   {result.resultA.label}: {result.resultA.date} - {result.resultA.zodiac}
                 </p>
-                <p className="text-[#333333] text-xl font-light tracking-wider">
-                  ({result.resultA.keywords})
-                </p>
+                <div className="text-white text-xl font-light leading-relaxed">
+                  <p>• PER: {result.resultA.reading.per}</p>
+                  <p>• PST: {result.resultA.reading.pst}</p>
+                  <p>• PRE: {result.resultA.reading.pre}</p>
+                  <p>• FTR: {result.resultA.reading.ftr}</p>
+                </div>
               </div>
               <div className="space-y-2">
-                <p className="text-[#444444] text-4xl font-light tracking-[0.2em]">
+                <p className="text-white text-4xl font-light tracking-[0.2em]">
                   {result.resultB.label}: {result.resultB.date} - {result.resultB.zodiac}
                 </p>
-                <p className="text-[#333333] text-xl font-light tracking-wider">
-                  ({result.resultB.keywords})
-                </p>
+                <div className="text-white text-xl font-light leading-relaxed">
+                  <p>• PER: {result.resultB.reading.per}</p>
+                  <p>• PST: {result.resultB.reading.pst}</p>
+                  <p>• PRE: {result.resultB.reading.pre}</p>
+                  <p>• FTR: {result.resultB.reading.ftr}</p>
+                </div>
               </div>
             </div>
           ) : (
