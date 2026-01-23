@@ -1,45 +1,47 @@
-// Fuzzy keyword mappings - phonetic aliases mapped to canonical keywords
+// Ultimate Phonetic Dictionary - comprehensive phonetic sounding words
 const TRIMESTER_ALIASES: Record<string, string> = {
   // HEALTH aliases
-  'health': 'health', 'help': 'health', 'healthy': 'health', 'wealth': 'health', 
-  'held': 'health', 'hell': 'health', 'felt': 'health',
+  'health': 'health', 'helth': 'health', 'helt': 'health', 'held': 'health', 
+  'heald': 'health', 'halth': 'health',
   // CHARACTER aliases
-  'character': 'character', 'charter': 'character', 'actor': 'character', 
-  'chart': 'character', 'director': 'character', 'tractor': 'character', 'kara': 'character',
+  'character': 'character', 'karakter': 'character', 'charactor': 'character', 
+  'charakter': 'character', 'carector': 'character', 'carekter': 'character',
   // PERSONALITY aliases
-  'personality': 'personality', 'personal': 'personality', 'reality': 'personality', 
-  'person': 'personality', 'ality': 'personality', 'personally': 'personality',
+  'personality': 'personality', 'personelity': 'personality', 'persanality': 'personality', 
+  'persnality': 'personality', 'personaliti': 'personality',
 };
 
 const RED_ALIASES: Record<string, string> = {
   // LOVE aliases
-  'love': 'love', 'low': 'love', 'live': 'love', 'laugh': 'love', 'glove': 'love', 'lov': 'love',
+  'love': 'love', 'luv': 'love', 'lav': 'love', 'loove': 'love', 'lobe': 'love',
   // ROMANCE aliases
-  'romance': 'romance', 'romans': 'romance', 'roam': 'romance', 'row': 'romance', 'roman': 'romance',
+  'romance': 'romance', 'romans': 'romance', 'romanss': 'romance', 'romanse': 'romance',
   // PARTNERSHIP aliases
-  'partnership': 'partnership', 'partner': 'partnership', 'ship': 'partnership', 'part': 'partnership',
-  // RELATIONSHIPS aliases
-  'relationships': 'relationships', 'relationship': 'relationships', 'relation': 'relationships', 
-  'relations': 'relationships', 'ships': 'relationships', 'relate': 'relationships',
+  'partnership': 'partnership', 'partnarship': 'partnership',
+  // RELATIONSHIP aliases
+  'relationship': 'relationships', 'relationships': 'relationships', 'relashanship': 'relationships', 
+  'relashanships': 'relationships',
 };
 
 const ECONOMIC_ALIASES: Record<string, string> = {
   // JOB aliases
-  'job': 'job', 'chop': 'job', 'jog': 'job', 'top': 'job', 'bob': 'job', 'jobs': 'job',
+  'job': 'job', 'jaab': 'job', 'jobe': 'job', 'jab': 'job',
   // WORK aliases
-  'work': 'work', 'walk': 'work', 'word': 'work', 'worth': 'work', 'coke': 'work', 'works': 'work',
+  'work': 'work', 'vork': 'work', 'werk': 'work', 'wok': 'work',
   // MONEY aliases
-  'money': 'money', 'honey': 'money', 'monday': 'money', 'funny': 'money', 'moneys': 'money',
+  'money': 'money', 'mony': 'money', 'mani': 'money', 'munny': 'money',
   // CAREER aliases
-  'career': 'career', 'carrier': 'career', 'korea': 'career', 'clear': 'career', 'care': 'career',
+  'career': 'career', 'carrier': 'career', 'karrier': 'career', 'carrer': 'career', 
+  'carear': 'career', 'karir': 'career', 'kareer': 'career', 'karyar': 'career', 'careyer': 'career',
   // FINANCE aliases
-  'finance': 'finance', 'fine': 'finance', 'ants': 'finance', 'dance': 'finance', 'finances': 'finance',
+  'finance': 'finance', 'finans': 'finance', 'finence': 'finance', 'finanss': 'finance',
   // SUCCESS aliases
-  'success': 'success', 'suck': 'success', 'cess': 'success', 'access': 'success', 'excess': 'success',
+  'success': 'success', 'sakses': 'success', 'sucses': 'success', 'suksess': 'success', 'succees': 'success',
   // PROFESSION aliases
-  'profession': 'profession', 'professor': 'profession', 'session': 'profession', 'fresh': 'profession',
+  'profession': 'profession', 'proffession': 'profession', 'profesion': 'profession', 
+  'prosession': 'profession', 'profeshion': 'profession',
   // OCCUPATION aliases
-  'occupation': 'occupation', 'occupy': 'occupation', 'passion': 'occupation', 'patient': 'occupation', 'asian': 'occupation',
+  'occupation': 'occupation', 'ocupation': 'occupation', 'okupation': 'occupation', 'occupashion': 'occupation',
 };
 
 // Canonical keyword values
