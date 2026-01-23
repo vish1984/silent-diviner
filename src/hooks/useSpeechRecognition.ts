@@ -132,11 +132,13 @@ export const useSpeechRecognition = ({ onMatch, onPartialUpdate }: UseSpeechReco
       recognition.maxAlternatives = 5; // Get multiple alternatives for better matching
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
-        // Don't process if we already triggered a match
-        if (matchTriggeredRef.current) return;
+        // Don't process if we already triggered a match or not active
+        if (matchTriggeredRef.current || !isActiveRef.current) return;
 
         lastSpeechTimeRef.current = Date.now();
         startSilenceTimer();
+        
+        console.log('[SPEECH] Got results, processing...');
 
         // Process ALL results (both interim and final)
         for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -149,6 +151,7 @@ export const useSpeechRecognition = ({ onMatch, onPartialUpdate }: UseSpeechReco
               transcript: result[j].transcript,
               confidence: result[j].confidence || 0
             });
+            console.log('[SPEECH] Alternative', j, ':', result[j].transcript);
           }
 
           // Scan ALL alternatives for matches (noise gate bypass)
@@ -220,24 +223,28 @@ export const useSpeechRecognition = ({ onMatch, onPartialUpdate }: UseSpeechReco
 
       recognition.onend = () => {
         console.log('[SPEECH] Ended, isActive:', isActiveRef.current);
-        if (isActiveRef.current) {
+        if (isActiveRef.current && !matchTriggeredRef.current) {
           // Immediate restart - keep listening
-          try {
-            recognition.start();
-            console.log('[SPEECH] Restarted successfully');
-          } catch (e) {
-            console.log('[SPEECH] Restart error:', e);
-            // Try again after short delay
-            setTimeout(() => {
-              if (isActiveRef.current) {
-                try {
-                  recognition.start();
-                } catch (e2) {
-                  console.log('[SPEECH] Delayed restart also failed:', e2);
-                }
+          setTimeout(() => {
+            if (isActiveRef.current && recognitionRef.current) {
+              try {
+                recognitionRef.current.start();
+                console.log('[SPEECH] Restarted successfully');
+              } catch (e) {
+                console.log('[SPEECH] Restart error:', e);
+                // Try again after longer delay
+                setTimeout(() => {
+                  if (isActiveRef.current && recognitionRef.current) {
+                    try {
+                      recognitionRef.current.start();
+                    } catch (e2) {
+                      console.log('[SPEECH] Delayed restart also failed:', e2);
+                    }
+                  }
+                }, 200);
               }
-            }, 100);
-          }
+            }
+          }, 50);
         }
       };
 
@@ -256,16 +263,31 @@ export const useSpeechRecognition = ({ onMatch, onPartialUpdate }: UseSpeechReco
   const startListening = useCallback(() => {
     if (recognitionRef.current && !isActiveRef.current) {
       try {
+        // Set active FIRST before any async operations
         isActiveRef.current = true;
         matchTriggeredRef.current = false;
         resetSlots();
-        recognitionRef.current.start();
         setIsListening(true);
         lastSpeechTimeRef.current = Date.now();
-        startSilenceTimer();
-        console.log('[SPEECH] Started listening');
+        
+        // Small delay to ensure state is set before starting
+        setTimeout(() => {
+          if (isActiveRef.current && recognitionRef.current) {
+            try {
+              recognitionRef.current.start();
+              console.log('[SPEECH] Started listening');
+              startSilenceTimer();
+            } catch (e) {
+              console.log('[SPEECH] Start error:', e);
+              isActiveRef.current = false;
+              setIsListening(false);
+            }
+          }
+        }, 50);
       } catch (e) {
-        console.log('[SPEECH] Start error:', e);
+        console.log('[SPEECH] Setup error:', e);
+        isActiveRef.current = false;
+        setIsListening(false);
       }
     }
   }, [resetSlots, startSilenceTimer]);
