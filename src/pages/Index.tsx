@@ -2,12 +2,14 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useWakeLock } from '@/hooks/useWakeLock';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
-import { parseKeywords, ParseResult } from '@/lib/keywordParser';
+import { ParseResult } from '@/lib/keywordParser';
+import { LockedSlots } from '@/lib/streamingKeywordParser';
 
 const Index = () => {
   const [result, setResult] = useState<ParseResult | null>(null);
   const [isActivated, setIsActivated] = useState(false);
   const [isLargeFont, setIsLargeFont] = useState(false);
+  const [partialSlots, setPartialSlots] = useState<LockedSlots | null>(null);
   const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
   const partialTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastTapRef = useRef<number>(0);
@@ -16,9 +18,7 @@ const Index = () => {
   // Keep screen awake
   useWakeLock();
 
-  const { isListening, isSupported, lastTranscript, startListening, stopListening, clearTranscript } = useSpeechRecognition();
-
-  // Clear partial timeout when we get a successful match
+  // Clear partial timeout
   const clearPartialTimeout = useCallback(() => {
     if (partialTimeoutRef.current) {
       clearTimeout(partialTimeoutRef.current);
@@ -26,30 +26,37 @@ const Index = () => {
     }
   }, []);
 
-  // Process transcript when it changes
-  useEffect(() => {
-    if (lastTranscript) {
-      const parsed = parseKeywords(lastTranscript);
-      
-      if (parsed.success) {
-        vibrateMatch();
-        setResult(parsed);
-        clearPartialTimeout();
-      } else if (parsed.partialMatch) {
-        vibrateError();
-        // Only show error if we don't have a successful result displayed
-        if (!result?.success) {
-          setResult(parsed);
-          // Start 15-second timeout to clear partial match
-          clearPartialTimeout();
-          partialTimeoutRef.current = setTimeout(() => {
-            setResult(prev => prev?.success ? prev : null);
-          }, 15000);
-        }
-      }
-      clearTranscript();
+  // Handle match - INSTANT callback from speech recognition
+  const handleMatch = useCallback((parsed: ParseResult) => {
+    if (parsed.success) {
+      // INSTANT haptic feedback - exact millisecond of 3rd word detection
+      vibrateMatch();
+      setResult(parsed);
+      setPartialSlots(null);
+      clearPartialTimeout();
     }
-  }, [lastTranscript, vibrateMatch, vibrateError, clearTranscript, result?.success, clearPartialTimeout]);
+  }, [vibrateMatch, clearPartialTimeout]);
+
+  // Handle partial slot updates
+  const handlePartialUpdate = useCallback((slots: LockedSlots) => {
+    const hasAny = slots.trimester || slots.red || slots.economic;
+    const hasAll = slots.trimester && slots.red && slots.economic;
+    
+    if (hasAny && !hasAll && !result?.success) {
+      setPartialSlots(slots);
+      
+      // Start 15-second timeout to clear partial slots
+      clearPartialTimeout();
+      partialTimeoutRef.current = setTimeout(() => {
+        setPartialSlots(null);
+      }, 15000);
+    }
+  }, [result?.success, clearPartialTimeout]);
+
+  const { isListening, isSupported, startListening, stopListening, clearSlots } = useSpeechRecognition({
+    onMatch: handleMatch,
+    onPartialUpdate: handlePartialUpdate,
+  });
 
   // Handle double-tap for font size toggle
   const handleDoubleTap = useCallback(() => {
@@ -61,9 +68,11 @@ const Index = () => {
     vibrateReady();
     stopListening();
     setResult(null);
+    setPartialSlots(null);
     setIsActivated(false);
+    clearSlots();
     clearPartialTimeout();
-  }, [vibrateReady, stopListening, clearPartialTimeout]);
+  }, [vibrateReady, stopListening, clearSlots, clearPartialTimeout]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
@@ -83,6 +92,8 @@ const Index = () => {
     // If already activated, a tap clears the result
     if (isActivated && result) {
       setResult(null);
+      setPartialSlots(null);
+      clearSlots();
       return;
     }
 
@@ -98,7 +109,7 @@ const Index = () => {
         startListening();
       }
     }, 500);
-  }, [isActivated, result, vibrateReady, startListening, handleDoubleTap, handleHardReset]);
+  }, [isActivated, result, vibrateReady, startListening, handleDoubleTap, handleHardReset, clearSlots]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
@@ -113,8 +124,10 @@ const Index = () => {
     e.preventDefault();
     if (isActivated && result) {
       setResult(null);
+      setPartialSlots(null);
+      clearSlots();
     }
-  }, [isActivated, result]);
+  }, [isActivated, result, clearSlots]);
 
   // Cleanup
   useEffect(() => {
@@ -164,45 +177,41 @@ const Index = () => {
         </p>
       )}
 
-      {result && (
+      {/* Show locked slots while detecting (partial match) */}
+      {partialSlots && !result?.success && (
+        <div className="absolute top-8 text-[#333333] text-lg font-light tracking-wider">
+          {partialSlots.trimester && <span className="mr-4">✓ {partialSlots.trimester}</span>}
+          {partialSlots.red && <span className="mr-4">✓ {partialSlots.red}</span>}
+          {partialSlots.economic && <span>✓ {partialSlots.economic}</span>}
+        </div>
+      )}
+
+      {result?.success && result.resultA && result.resultB && (
         <div className="text-left px-8">
-          {result.success && result.resultA && result.resultB ? (
-            <div className="space-y-10">
-              <div className="space-y-2">
-                <p className={`text-white ${labelSize} font-bold tracking-[0.2em]`}>
-                  {result.resultA.label}: {result.resultA.date} - {result.resultA.zodiac} ({result.resultA.vedic})
-                </p>
-                <div className={`text-white ${readingSize} font-light leading-relaxed`}>
-                  <p>• PER: {result.resultA.reading.per}</p>
-                  <p>• PST: {result.resultA.reading.pst}</p>
-                  <p>• PRE: {result.resultA.reading.pre}</p>
-                  <p>• FTR: {result.resultA.reading.ftr}</p>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <p className={`text-white ${labelSize} font-bold tracking-[0.2em]`}>
-                  {result.resultB.label}: {result.resultB.date} - {result.resultB.zodiac} ({result.resultB.vedic})
-                </p>
-                <div className={`text-white ${readingSize} font-light leading-relaxed`}>
-                  <p>• PER: {result.resultB.reading.per}</p>
-                  <p>• PST: {result.resultB.reading.pst}</p>
-                  <p>• PRE: {result.resultB.reading.pre}</p>
-                  <p>• FTR: {result.resultB.reading.ftr}</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {result.partialMatch && (
-                <p className={`text-[#333333] ${statusSize} font-light tracking-wider uppercase`}>
-                  Heard: {Object.values(result.partialMatch).filter(Boolean).join(', ')}
-                </p>
-              )}
-              <p className={`text-[#444444] ${statusSize} font-light tracking-wider`}>
-                {result.error}
+          <div className="space-y-10">
+            <div className="space-y-2">
+              <p className={`text-white ${labelSize} font-bold tracking-[0.2em]`}>
+                {result.resultA.label}: {result.resultA.date} - {result.resultA.zodiac} ({result.resultA.vedic})
               </p>
+              <div className={`text-white ${readingSize} font-light leading-relaxed`}>
+                <p>• PER: {result.resultA.reading.per}</p>
+                <p>• PST: {result.resultA.reading.pst}</p>
+                <p>• PRE: {result.resultA.reading.pre}</p>
+                <p>• FTR: {result.resultA.reading.ftr}</p>
+              </div>
             </div>
-          )}
+            <div className="space-y-2">
+              <p className={`text-white ${labelSize} font-bold tracking-[0.2em]`}>
+                {result.resultB.label}: {result.resultB.date} - {result.resultB.zodiac} ({result.resultB.vedic})
+              </p>
+              <div className={`text-white ${readingSize} font-light leading-relaxed`}>
+                <p>• PER: {result.resultB.reading.per}</p>
+                <p>• PST: {result.resultB.reading.pst}</p>
+                <p>• PRE: {result.resultB.reading.pre}</p>
+                <p>• FTR: {result.resultB.reading.ftr}</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
